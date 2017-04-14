@@ -1,0 +1,32 @@
+{
+  "intents": [
+    {
+      "intent": "GetTasks"
+    },
+    {
+      "slots": [
+        {
+          "name": "TaskNumber",
+          "type": "AMAZON.NUMBER"
+        }
+      ],
+      "intent": "GetTaskInfo"
+    },
+    {
+      "slots": [
+        {
+          "name": "Command",
+          "type": "LIST_OF_COMMANDS"
+        },
+        {
+          "name": "TaskNumber",
+          "type": "AMAZON.NUMBER"
+        }
+      ],
+      "intent": "ProcessTask"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    }
+  ]
+}
