@@ -6,4 +6,6 @@ public interface OutputSpeechFactory<T extends OutputSpeech> {
 
 	T getOutputSpeech();
 	
+	String getSpeechText();
+	
 }

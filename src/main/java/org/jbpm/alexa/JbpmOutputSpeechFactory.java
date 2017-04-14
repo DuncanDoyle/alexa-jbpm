@@ -1,31 +1,32 @@
 package org.jbpm.alexa;
 
+import java.util.List;
+
+import org.kie.server.api.model.instance.TaskSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazon.speech.ui.PlainTextOutputSpeech;
-import com.redhat.bpms.examples.mortgage.model.ShoppingCart;
 import com.redhat.bpms.examples.mortgage.model.ShoppingCartItem;
 
 public class JbpmOutputSpeechFactory implements OutputSpeechFactory<PlainTextOutputSpeech> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JbpmOutputSpeechFactory.class);
 	
-	private final String SHOPPING_CART_CONTAINS_TEXT = "Your shopping cart contains, ";
+	private final List<TaskSummary> taskSummaries;
 	
-	private final String TOTAL_ORDER_AMOUNT_TEXT = "Your total order amount is ";
+	private String speechText;
 	
-	private final ShoppingCart shoppingCart;
-	
-	public JbpmOutputSpeechFactory(ShoppingCart shoppingCart) {
-		this.shoppingCart = shoppingCart;
+	public JbpmOutputSpeechFactory(List<TaskSummary> taskSummaries) {
+		this.taskSummaries = taskSummaries;
 	}
 	
 	@Override
 	public PlainTextOutputSpeech getOutputSpeech() {
 		PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-		StringBuilder speechBuilder = new StringBuilder(SHOPPING_CART_CONTAINS_TEXT);
+		StringBuilder speechBuilder = new StringBuilder();
 		
+		/*
 		//Items
 		if (shoppingCart.shoppingCartItemList.isEmpty()) {
 			speechBuilder.append("no items.");
@@ -40,9 +41,15 @@ public class JbpmOutputSpeechFactory implements OutputSpeechFactory<PlainTextOut
 		speechBuilder.append(TOTAL_ORDER_AMOUNT_TEXT).append(shoppingCart.cartTotal);
 		String speechText = speechBuilder.toString();
 		LOGGER.debug("SpeechText for ShoppingCart: " +  speechText);
-		
-		speech.setText(speechBuilder.toString());
+		*/
+		String speechText = speechBuilder.toString();
+		this.speechText = speechText;
+		speech.setText(speechText);
 		return speech;
+	}
+	
+	public String getSpeechText() {
+		return speechText;
 	}
 
 }

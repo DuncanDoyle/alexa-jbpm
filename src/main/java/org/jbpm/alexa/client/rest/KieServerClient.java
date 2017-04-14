@@ -1,5 +1,7 @@
 package org.jbpm.alexa.client.rest;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -7,8 +9,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
 import org.jbpm.alexa.util.Environment;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.CredentialsProvider;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -45,6 +47,10 @@ public class KieServerClient {
 	
 	@PostConstruct
 	public void init() {
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Creating KieServerClient for Kie-Server at '" + environment.getKieServerUrl() + "' and container '" + environment.getContainerId() + "'.");
+		}
+		
 		//Create the config
         CredentialsProvider credentialsProvider = new EnteredCredentialsProvider("kieserver", "kieserver1!");
         KieServicesConfiguration kieServicesConfig = KieServicesFactory.newRestConfiguration(environment.getKieServerUrl(), credentialsProvider);
@@ -55,12 +61,9 @@ public class KieServerClient {
         queryClient = kieServicesClient.getServicesClient(QueryServicesClient.class);
 	}
 	
-	public TaskInstanceList getTasks() {
-		//TODO: User should be configurable.
-		taskClient.findTasksAssignedAsPotentialOwner("bpmsAdmin", 0, 10);
-		
-		
-		return null;
+	public List<TaskSummary> getTasks() {
+		List<TaskSummary> taskSummary = taskClient.findTasksAssignedAsPotentialOwner(environment.getTaskUser(), 0, 10);
+		return taskSummary;
 	}
 	
 	

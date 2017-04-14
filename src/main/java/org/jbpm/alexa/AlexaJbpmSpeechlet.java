@@ -62,12 +62,15 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 		String intentName = (intent != null) ? intent.getName() : null;
 
 		switch (intentName) {
-		case "PlaceOrder":
-			LOGGER.debug("Place Order intent received.");
-			return getProductOrderResponse();
-		case "ShoppingCart":
-			LOGGER.debug("Shopping Cart intent received.");
-			return getShoppingCartResponse();
+		case "GetTasks":
+			LOGGER.debug("GetTasks intent received.");
+			return getGetTasksResponse();
+		case "GetTaskInfo":
+			LOGGER.debug("GetTaskInfo intent received.");
+			return getGetTaskInfoResponse();
+		case "ProcessTask":
+			LOGGER.debug("ProcessTask intent received.");
+			return getProcessTaskResponse();
 		case "AMAZON.HelpIntent": 
 			LOGGER.debug("HelpIntent");
 			return getHelpResponse();
@@ -90,7 +93,7 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	 */
 	private SpeechletResponse getWelcomeResponse() {
 		
-		String speechText = "Welcome to the Alexa Red Hat Coolstore demo. You can say: what's in my cart";
+		String speechText = "Welcome to the Alexa jBPM skill. You can say: get my tasks";
 
 		// Create the Simple card content.
 		// Card is displayed in the application.
@@ -111,31 +114,57 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	}
 	
 	/**
-	 * Creates a {@code SpeechletResponse} for the hello intent.
+	 * Creates a {@code SpeechletResponse} for the <code>GetTasks</code>
 	 *
 	 * @return SpeechletResponse spoken and visual response for the given intent
 	 */
-	private SpeechletResponse getProductOrderResponse() {
-		String speechText = "You're trying to order a product.";
+	private SpeechletResponse getGetTasksResponse() {
+		LOGGER.debug("Building GetTasks response.");
+		
+		OutputSpeechFactory<PlainTextOutputSpeech> osFactory = new JbpmOutputSpeechFactory(kieServerClient.getTasks());
+		
 
 		// Create the Simple card content.
 		SimpleCard card = new SimpleCard();
-		card.setTitle("Ordered a product.");
-		card.setContent(speechText);
+		card.setTitle("GetTasks");
+		card.setContent(osFactory.getSpeechText());
 
-		// Create the plain text output.
-		PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-		speech.setText(speechText);
-
-		return SpeechletResponse.newTellResponse(speech, card);
+		return SpeechletResponse.newTellResponse(osFactory.getOutputSpeech(), card);
 	}
 
 	/**
-	 * Creates a {@code SpeechletResponse} for the hello intent.
+	 * Creates a {@code SpeechletResponse} for the <code>GetTaskInfo</code>.
 	 *
 	 * @return SpeechletResponse spoken and visual response for the given intent
 	 */
-	private SpeechletResponse getShoppingCartResponse() {
+	private SpeechletResponse getGetTaskInfoResponse() {
+		LOGGER.debug("Building GetTaskInfo response.");
+		/*
+		String speechText = "Your shopping cart is empty.";
+
+		// Create the Simple card content.
+		SimpleCard card = new SimpleCard();
+		card.setTitle("Empty shopping cart.");
+		card.setContent(speechText);
+
+		//Get the shoppingCart. The ID is fixed and set to 1 (until we can somehow links someone's Alexa account to a given ID of the cart).
+		ShoppingCart shoppingCart = kieServerClient.getShoppingCart(environment.getContainerId());
+		
+		// Create the plain text output.
+		OutputSpeech outputSpeech = new JbpmOutputSpeechFactory(shoppingCart).getOutputSpeech();
+		
+		return SpeechletResponse.newTellResponse(outputSpeech, card);
+		*/
+		return null;
+	}
+	
+	/**
+	 * Creates a {@code SpeechletResponse} for the <code>GetTaskInfo</code>.
+	 *
+	 * @return SpeechletResponse spoken and visual response for the given intent
+	 */
+	private SpeechletResponse getProcessTaskResponse() {
+		/*
 		LOGGER.debug("Building ShoppingCart response.");
 		String speechText = "Your shopping cart is empty.";
 
@@ -151,9 +180,9 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 		OutputSpeech outputSpeech = new JbpmOutputSpeechFactory(shoppingCart).getOutputSpeech();
 		
 		return SpeechletResponse.newTellResponse(outputSpeech, card);
+		*/
+		return null;
 	}
-	
-	
 	
 
 	/**
