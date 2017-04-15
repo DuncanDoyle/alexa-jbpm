@@ -14,7 +14,7 @@ import com.amazon.speech.speechlet.servlet.SpeechletServlet;
  * 
  * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
-@WebServlet("/")
+@WebServlet("/speech")
 public class AlexaJbpmSpeechletServlet extends SpeechletServlet {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(AlexaJbpmSpeechletServlet.class);
