@@ -31,11 +31,10 @@ public class JbpmOutputSpeechFactory implements OutputSpeechFactory<PlainTextOut
 				.append((taskSummaries.size() <= taskPageSize) ? taskSummaries.size() : taskPageSize).append(" tasks. ");
 
 		taskSummaries.stream().limit(taskPageSize).forEach(t -> {
-			speechBuilder.append("Task with id ").append(t.getId());
-			speechBuilder.append("has Name ").append(t.getName());
-			speechBuilder.append("has Process id ").append(t.getProcessId());
-			speechBuilder.append("has Priority ").append(t.getPriority());
-			speechBuilder.append(".");
+			speechBuilder.append("Task with id ").append(t.getId()).append(", ");
+			speechBuilder.append("has Name ").append(t.getName()).append(", ");
+			speechBuilder.append("has Process id ").append(t.getProcessId()).append(", ");
+			speechBuilder.append("has Priority ").append(t.getPriority()).append(". ");
 		});
 
 		String speechText = speechBuilder.toString();
