@@ -20,27 +20,32 @@ public class JbpmOutputSpeechFactory implements OutputSpeechFactory<PlainTextOut
 
 	public JbpmOutputSpeechFactory(List<TaskSummary> taskSummaries) {
 		this.taskSummaries = taskSummaries;
-	}
 
-	@Override
-	public PlainTextOutputSpeech getOutputSpeech() {
-		PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
 		StringBuilder speechBuilder = new StringBuilder("You have " + taskSummaries.size() + " tasks in your inbox. ");
-		
+
 		speechBuilder.append("These are the first ")
-				.append((taskSummaries.size() <= taskPageSize) ? taskSummaries.size() : taskPageSize).append(" tasks. ");
+				.append((taskSummaries.size() <= taskPageSize) ? taskSummaries.size() : taskPageSize)
+				.append(" tasks. ");
 
 		taskSummaries.stream().limit(taskPageSize).forEach(t -> {
 			speechBuilder.append("Task with i.d. ").append(t.getId()).append(", ");
 			speechBuilder.append("has Name ").append(t.getName()).append(", ");
-			speechBuilder.append("has Process i.d. ").append(t.getProcessId()).append(", ");
+
+			String processId = t.getProcessId();
+			String trimmedProcessId = processId.substring(processId.lastIndexOf(".") + 1);
+			speechBuilder.append("has Process i.d. ").append(trimmedProcessId).append(", ");
+
 			speechBuilder.append("has Priority ").append(t.getPriority()).append(". ");
 		});
+		this.speechText = speechBuilder.toString();
 
-		String speechText = speechBuilder.toString();
-		this.speechText = speechText;
-		speech.setText(speechText);
-		return speech;
+	}
+
+	@Override
+	public PlainTextOutputSpeech getOutputSpeech() {
+		PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+		outputSpeech.setText(this.getSpeechText());
+		return outputSpeech;
 	}
 
 	public String getSpeechText() {

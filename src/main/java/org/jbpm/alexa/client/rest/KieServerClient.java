@@ -61,9 +61,13 @@ public class KieServerClient {
         queryClient = kieServicesClient.getServicesClient(QueryServicesClient.class);
 	}
 	
-	public List<TaskSummary> getTasks() {
-		List<TaskSummary> taskSummary = taskClient.findTasksAssignedAsPotentialOwner(environment.getTaskUser(), 0, 10);
-		return taskSummary;
+	public List<TaskSummary> getTasks() throws UnexpectedKieServerResponseException {
+		try {
+			List<TaskSummary> taskSummary = taskClient.findTasksAssignedAsPotentialOwner(environment.getTaskUser(), 0, 10);
+			return taskSummary;
+		} catch (Exception e) {
+			throw new UnexpectedKieServerResponseException("Unexpected reponse while retrieving tasks from KieServer.", e);
+		}
 	}
 	
 	

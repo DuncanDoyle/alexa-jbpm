@@ -1,10 +1,14 @@
 package org.jbpm.alexa;
 
+import java.util.List;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jbpm.alexa.client.rest.KieServerClient;
+import org.jbpm.alexa.client.rest.UnexpectedKieServerResponseException;
 import org.jbpm.alexa.util.Environment;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,9 +123,13 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	private SpeechletResponse getGetTasksResponse() {
 		LOGGER.debug("Building GetTasks response.");
 		
-		OutputSpeechFactory<PlainTextOutputSpeech> osFactory = new JbpmOutputSpeechFactory(kieServerClient.getTasks());
+		OutputSpeechFactory<PlainTextOutputSpeech> osFactory;
+		try {
+			osFactory = new JbpmOutputSpeechFactory(kieServerClient.getTasks());
+		} catch (UnexpectedKieServerResponseException e) {
+			osFactory = new KieServerErrorOutputSpeechFactory(e);
+		}
 		
-
 		// Create the Simple card content.
 		SimpleCard card = new SimpleCard();
 		card.setTitle("GetTasks");
