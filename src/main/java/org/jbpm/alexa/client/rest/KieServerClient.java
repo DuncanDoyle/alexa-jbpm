@@ -52,7 +52,7 @@ public class KieServerClient {
 		}
 		
 		//Create the config
-        CredentialsProvider credentialsProvider = new EnteredCredentialsProvider("kieserver", "kieserver1!");
+        CredentialsProvider credentialsProvider = new EnteredCredentialsProvider("kieserver1", "kieserver1!");
         KieServicesConfiguration kieServicesConfig = KieServicesFactory.newRestConfiguration(environment.getKieServerUrl(), credentialsProvider);
         
         //Create the client.
