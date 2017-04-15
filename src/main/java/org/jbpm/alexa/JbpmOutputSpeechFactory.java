@@ -31,9 +31,9 @@ public class JbpmOutputSpeechFactory implements OutputSpeechFactory<PlainTextOut
 				.append((taskSummaries.size() <= taskPageSize) ? taskSummaries.size() : taskPageSize).append(" tasks. ");
 
 		taskSummaries.stream().limit(taskPageSize).forEach(t -> {
-			speechBuilder.append("Task with id ").append(t.getId()).append(", ");
+			speechBuilder.append("Task with i.d. ").append(t.getId()).append(", ");
 			speechBuilder.append("has Name ").append(t.getName()).append(", ");
-			speechBuilder.append("has Process id ").append(t.getProcessId()).append(", ");
+			speechBuilder.append("has Process i.d. ").append(t.getProcessId()).append(", ");
 			speechBuilder.append("has Priority ").append(t.getPriority()).append(". ");
 		});
 
