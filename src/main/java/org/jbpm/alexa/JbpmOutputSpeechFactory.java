@@ -25,16 +25,17 @@ public class JbpmOutputSpeechFactory implements OutputSpeechFactory<PlainTextOut
 	@Override
 	public PlainTextOutputSpeech getOutputSpeech() {
 		PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-		StringBuilder speechBuilder = new StringBuilder("You have " + taskSummaries.size() + " tasks in your inbox.");
-
+		StringBuilder speechBuilder = new StringBuilder("You have " + taskSummaries.size() + " tasks in your inbox. ");
+		
 		speechBuilder.append("These are the first ")
-				.append((taskSummaries.size() <= taskPageSize) ? taskSummaries.size() : taskPageSize).append(" tasks.");
+				.append((taskSummaries.size() <= taskPageSize) ? taskSummaries.size() : taskPageSize).append(" tasks. ");
 
 		taskSummaries.stream().limit(taskPageSize).forEach(t -> {
 			speechBuilder.append("Task with id ").append(t.getId());
 			speechBuilder.append("has Name ").append(t.getName());
 			speechBuilder.append("has Process id ").append(t.getProcessId());
 			speechBuilder.append("has Priority ").append(t.getPriority());
+			speechBuilder.append(".");
 		});
 
 		String speechText = speechBuilder.toString();
