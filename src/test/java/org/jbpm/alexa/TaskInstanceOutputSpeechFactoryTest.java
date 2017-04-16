@@ -1,5 +1,7 @@
 package org.jbpm.alexa;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +36,8 @@ public class TaskInstanceOutputSpeechFactoryTest {
 		OutputSpeechFactory<PlainTextOutputSpeech> osFactory = new TaskSummaryListOutputSpeechFactory(taskSummaries);
 		
 		String speechText = osFactory.getSpeechText();
-		System.out.println(speechText);
+		String expectedSpeechText = "You have 2 tasks in your inbox. These are the first 2 tasks. Task with i.d. 42, has Name TestTask, has Process i.d. TestProcessId, has Priority 0. Task with i.d. 42, has Name TestTaskTwo, has Process i.d. TestProcessIdTwo, has Priority 1. ";
+		assertEquals(expectedSpeechText, speechText);
 	}
 	
 	
