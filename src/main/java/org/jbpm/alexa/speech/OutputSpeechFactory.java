@@ -1,4 +1,4 @@
-package org.jbpm.alexa;
+package org.jbpm.alexa.speech;
 
 import com.amazon.speech.ui.OutputSpeech;
 

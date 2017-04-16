@@ -9,7 +9,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
 import org.jbpm.alexa.util.Environment;
-import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.CredentialsProvider;
 import org.kie.server.client.KieServicesClient;
@@ -67,6 +67,15 @@ public class KieServerClient {
 			return taskSummary;
 		} catch (Exception e) {
 			throw new UnexpectedKieServerResponseException("Unexpected reponse while retrieving tasks from KieServer.", e);
+		}
+	}
+	
+	public TaskInstance getTasksInfo(Long taskId) throws UnexpectedKieServerResponseException {
+		try {
+			TaskInstance taskInstance = taskClient.findTaskById(taskId);
+			return taskInstance;
+		} catch (Exception e) {
+			throw new UnexpectedKieServerResponseException("Unexpected reponse while retrieving task instance with id " + taskId + " from KieServer.", e);
 		}
 	}
 	

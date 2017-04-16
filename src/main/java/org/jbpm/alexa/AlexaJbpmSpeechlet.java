@@ -1,18 +1,23 @@
 package org.jbpm.alexa;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jbpm.alexa.client.rest.KieServerClient;
 import org.jbpm.alexa.client.rest.UnexpectedKieServerResponseException;
+import org.jbpm.alexa.speech.GenericOutputSpeechFactory;
+import org.jbpm.alexa.speech.KieServerErrorOutputSpeechFactory;
+import org.jbpm.alexa.speech.OutputSpeechFactory;
+import org.jbpm.alexa.speech.TaskInstanceOutputSpeechFactory;
+import org.jbpm.alexa.speech.TaskSummaryListOutputSpeechFactory;
 import org.jbpm.alexa.util.Environment;
-import org.kie.server.api.model.instance.TaskSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazon.speech.slu.Intent;
+import com.amazon.speech.slu.Slot;
 import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.LaunchRequest;
 import com.amazon.speech.speechlet.Session;
@@ -25,9 +30,9 @@ import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.Reprompt;
 import com.amazon.speech.ui.SimpleCard;
 
-
 /**
- * Alexa {@link Speechlet} which implements the interaction patterns for our Alexa jBPM skill.
+ * Alexa {@link Speechlet} which implements the interaction patterns for our
+ * Alexa jBPM skill.
  * 
  * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  *
@@ -36,13 +41,14 @@ import com.amazon.speech.ui.SimpleCard;
 public class AlexaJbpmSpeechlet implements Speechlet {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AlexaJbpmSpeechlet.class);
-	
+
 	@Inject
 	private Environment environment;
-	
+
 	@Inject
 	private KieServerClient kieServerClient;
-	
+
+	private static final String TASK_NUMBER_SLOT = "TaskNumber";
 
 	@Override
 	public void onSessionStarted(SessionStartedRequest request, Session session) throws SpeechletException {
@@ -69,17 +75,17 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 			return getGetTasksResponse();
 		case "GetTaskInfo":
 			LOGGER.debug("GetTaskInfo intent received.");
-			return getGetTaskInfoResponse();
+			return getGetTaskInfoResponse(intent);
 		case "ProcessTask":
 			LOGGER.debug("ProcessTask intent received.");
 			return getProcessTaskResponse();
-		case "AMAZON.HelpIntent": 
+		case "AMAZON.HelpIntent":
 			LOGGER.debug("HelpIntent");
 			return getHelpResponse();
 		default:
 			throw new SpeechletException("Invalid Intent.");
 		}
-		
+
 	}
 
 	@Override
@@ -94,7 +100,7 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	 * @return SpeechletResponse spoken and visual response for the given intent
 	 */
 	private SpeechletResponse getWelcomeResponse() {
-		
+
 		String speechText = "Welcome to the Alexa jBPM skill. You can say: get my tasks";
 
 		// Create the Simple card content.
@@ -108,13 +114,14 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 		speech.setText(speechText);
 
 		// Create reprompt
-		// TODO: Reprompt seems to be a prompt that is resend when the session is kept open (like in an AskResponse).
+		// TODO: Reprompt seems to be a prompt that is resend when the session
+		// is kept open (like in an AskResponse).
 		Reprompt reprompt = new Reprompt();
 		reprompt.setOutputSpeech(speech);
 
 		return SpeechletResponse.newAskResponse(speech, reprompt, card);
 	}
-	
+
 	/**
 	 * Creates a {@code SpeechletResponse} for the <code>GetTasks</code>
 	 *
@@ -122,14 +129,14 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	 */
 	private SpeechletResponse getGetTasksResponse() {
 		LOGGER.debug("Building GetTasks response.");
-		
+
 		OutputSpeechFactory<PlainTextOutputSpeech> osFactory;
 		try {
-			osFactory = new JbpmOutputSpeechFactory(kieServerClient.getTasks());
+			osFactory = new TaskSummaryListOutputSpeechFactory(kieServerClient.getTasks());
 		} catch (UnexpectedKieServerResponseException e) {
 			osFactory = new KieServerErrorOutputSpeechFactory(e);
 		}
-		
+
 		// Create the Simple card content.
 		SimpleCard card = new SimpleCard();
 		card.setTitle("GetTasks");
@@ -143,27 +150,36 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	 *
 	 * @return SpeechletResponse spoken and visual response for the given intent
 	 */
-	private SpeechletResponse getGetTaskInfoResponse() {
+	private SpeechletResponse getGetTaskInfoResponse(Intent intent) {
 		LOGGER.debug("Building GetTaskInfo response.");
-		/*
-		String speechText = "Your shopping cart is empty.";
+
+		OutputSpeechFactory<PlainTextOutputSpeech> osFactory = null;
+		
+		Map<String, Slot> slots = intent.getSlots();
+		Slot taskNumberSlot = slots.get(TASK_NUMBER_SLOT);
+		
+		if (taskNumberSlot != null) {
+			try {
+				Long taskNumber = new Long(taskNumberSlot.getValue());
+				osFactory = new TaskInstanceOutputSpeechFactory(kieServerClient.getTasksInfo(taskNumber));
+			} catch (UnexpectedKieServerResponseException e) {
+				osFactory = new KieServerErrorOutputSpeechFactory(e);
+			}
+		} else {
+			// We can't do much without a task number, so we need to provide
+			// this output.
+			// TODO: we might improve this by asking for the number again.
+			osFactory = new GenericOutputSpeechFactory("Can't retrieve task info. I didn't hear a task number.");
+		}
 
 		// Create the Simple card content.
 		SimpleCard card = new SimpleCard();
-		card.setTitle("Empty shopping cart.");
-		card.setContent(speechText);
+		card.setTitle("GetTasksInfo");
+		card.setContent(osFactory.getSpeechText());
 
-		//Get the shoppingCart. The ID is fixed and set to 1 (until we can somehow links someone's Alexa account to a given ID of the cart).
-		ShoppingCart shoppingCart = kieServerClient.getShoppingCart(environment.getContainerId());
-		
-		// Create the plain text output.
-		OutputSpeech outputSpeech = new JbpmOutputSpeechFactory(shoppingCart).getOutputSpeech();
-		
-		return SpeechletResponse.newTellResponse(outputSpeech, card);
-		*/
-		return null;
+		return SpeechletResponse.newTellResponse(osFactory.getOutputSpeech(), card);
 	}
-	
+
 	/**
 	 * Creates a {@code SpeechletResponse} for the <code>GetTaskInfo</code>.
 	 *
@@ -171,25 +187,25 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	 */
 	private SpeechletResponse getProcessTaskResponse() {
 		/*
-		LOGGER.debug("Building ShoppingCart response.");
-		String speechText = "Your shopping cart is empty.";
-
-		// Create the Simple card content.
-		SimpleCard card = new SimpleCard();
-		card.setTitle("Empty shopping cart.");
-		card.setContent(speechText);
-
-		//Get the shoppingCart. The ID is fixed and set to 1 (until we can somehow links someone's Alexa account to a given ID of the cart).
-		ShoppingCart shoppingCart = kieServerClient.getShoppingCart(environment.getContainerId());
-		
-		// Create the plain text output.
-		OutputSpeech outputSpeech = new JbpmOutputSpeechFactory(shoppingCart).getOutputSpeech();
-		
-		return SpeechletResponse.newTellResponse(outputSpeech, card);
-		*/
+		 * LOGGER.debug("Building ShoppingCart response."); String speechText =
+		 * "Your shopping cart is empty.";
+		 * 
+		 * // Create the Simple card content. SimpleCard card = new
+		 * SimpleCard(); card.setTitle("Empty shopping cart.");
+		 * card.setContent(speechText);
+		 * 
+		 * //Get the shoppingCart. The ID is fixed and set to 1 (until we can
+		 * somehow links someone's Alexa account to a given ID of the cart).
+		 * ShoppingCart shoppingCart =
+		 * kieServerClient.getShoppingCart(environment.getContainerId());
+		 * 
+		 * // Create the plain text output. OutputSpeech outputSpeech = new
+		 * JbpmOutputSpeechFactory(shoppingCart).getOutputSpeech();
+		 * 
+		 * return SpeechletResponse.newTellResponse(outputSpeech, card);
+		 */
 		return null;
 	}
-	
 
 	/**
 	 * Creates a {@code SpeechletResponse} for the help intent.

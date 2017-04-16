@@ -1,4 +1,4 @@
-package org.jbpm.alexa;
+package org.jbpm.alexa.speech;
 
 import org.jbpm.alexa.client.rest.UnexpectedKieServerResponseException;
 
