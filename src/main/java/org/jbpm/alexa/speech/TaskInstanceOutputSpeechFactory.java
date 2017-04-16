@@ -1,5 +1,6 @@
 package org.jbpm.alexa.speech;
 
+import org.jbpm.alexa.speech.util.SpeechUtil;
 import org.kie.server.api.model.instance.TaskInstance;
 
 public class TaskInstanceOutputSpeechFactory extends GenericOutputSpeechFactory {
@@ -16,7 +17,7 @@ public class TaskInstanceOutputSpeechFactory extends GenericOutputSpeechFactory 
 		speechBuilder.append("The task name is: ").append(taskInstance.getName()).append(". ");
 		speechBuilder.append("It's description is: ").append(taskInstance.getDescription()).append(". ");
 
-		speechBuilder.append("It was created by process : ").append(taskInstance.getProcessId()).append(", ")
+		speechBuilder.append("It was created by process : ").append(SpeechUtil.getProcessNameFromFQN(taskInstance.getProcessId())).append(", ")
 				.append("with process instance i.d.: ").append(taskInstance.getProcessInstanceId()).append(". ");
 
 		return speechBuilder.toString();

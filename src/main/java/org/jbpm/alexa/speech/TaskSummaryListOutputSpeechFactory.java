@@ -3,6 +3,7 @@ package org.jbpm.alexa.speech;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jbpm.alexa.speech.util.SpeechUtil;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +37,8 @@ public class TaskSummaryListOutputSpeechFactory extends GenericOutputSpeechFacto
 			StringBuilder taskSpeechBuilder = new StringBuilder();
 			taskSpeechBuilder.append("Task with i.d. ").append(t.getId()).append(", ");
 			taskSpeechBuilder.append("has Name ").append(t.getName()).append(", ");
-
-			String processId = t.getProcessId();
-			String trimmedProcessId = processId.substring(processId.lastIndexOf(".") + 1);
-			taskSpeechBuilder.append("has Process i.d. ").append(trimmedProcessId).append(", ");
+			
+			taskSpeechBuilder.append("has Process i.d. ").append(SpeechUtil.getProcessNameFromFQN(t.getProcessId())).append(", ");
 
 			taskSpeechBuilder.append("has Priority ").append(t.getPriority()).append(". ");
 			return taskSpeechBuilder.toString();
