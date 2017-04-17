@@ -6,6 +6,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jbpm.alexa.client.rest.KieServerClient;
+import org.jbpm.alexa.client.rest.KieServerClient.TaskCommand;
 import org.jbpm.alexa.client.rest.UnexpectedKieServerResponseException;
 import org.jbpm.alexa.speech.GenericOutputSpeechFactory;
 import org.jbpm.alexa.speech.KieServerErrorOutputSpeechFactory;
@@ -49,6 +50,8 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	private KieServerClient kieServerClient;
 
 	private static final String TASK_NUMBER_SLOT = "TaskNumber";
+	
+	private static final String TASK_COMMAND_SLOT = "Command";
 
 	@Override
 	public void onSessionStarted(SessionStartedRequest request, Session session) throws SpeechletException {
@@ -78,7 +81,7 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 			return getGetTaskInfoResponse(intent);
 		case "ProcessTask":
 			LOGGER.debug("ProcessTask intent received.");
-			return getProcessTaskResponse();
+			return getProcessTaskResponse(intent);
 		case "AMAZON.HelpIntent":
 			LOGGER.debug("HelpIntent");
 			return getHelpResponse();
@@ -185,26 +188,39 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 	 *
 	 * @return SpeechletResponse spoken and visual response for the given intent
 	 */
-	private SpeechletResponse getProcessTaskResponse() {
-		/*
-		 * LOGGER.debug("Building ShoppingCart response."); String speechText =
-		 * "Your shopping cart is empty.";
-		 * 
-		 * // Create the Simple card content. SimpleCard card = new
-		 * SimpleCard(); card.setTitle("Empty shopping cart.");
-		 * card.setContent(speechText);
-		 * 
-		 * //Get the shoppingCart. The ID is fixed and set to 1 (until we can
-		 * somehow links someone's Alexa account to a given ID of the cart).
-		 * ShoppingCart shoppingCart =
-		 * kieServerClient.getShoppingCart(environment.getContainerId());
-		 * 
-		 * // Create the plain text output. OutputSpeech outputSpeech = new
-		 * JbpmOutputSpeechFactory(shoppingCart).getOutputSpeech();
-		 * 
-		 * return SpeechletResponse.newTellResponse(outputSpeech, card);
-		 */
-		return null;
+	private SpeechletResponse getProcessTaskResponse(Intent intent) {
+		LOGGER.debug("Processing task.");
+
+		OutputSpeechFactory<PlainTextOutputSpeech> osFactory = null;
+		
+		Map<String, Slot> slots = intent.getSlots();
+		Slot taskNumberSlot = slots.get(TASK_NUMBER_SLOT);
+		Slot taskCommandSlot = slots.get(TASK_COMMAND_SLOT);
+		
+		if (taskNumberSlot != null && taskCommandSlot != null) {
+			try {
+				Long taskNumber = new Long(taskNumberSlot.getValue());
+				KieServerClient.TaskCommand command = TaskCommand.valueOf(taskCommandSlot.getValue());
+				//osFactory = new TaskInstanceOutputSpeechFactory(kieServerClient.getTasksInfo(taskNumber));
+				kieServerClient.processTask(taskNumber,command);
+				osFactory = new GenericOutputSpeechFactory("Task with i.d. " + taskNumber + " successfully " + command.getSpeechText() + ".");
+			} catch (UnexpectedKieServerResponseException e) {
+				osFactory = new KieServerErrorOutputSpeechFactory(e);
+			}
+		} else {
+			// We can't do much without a task number and/or command, so we need to provide
+			// this output.
+			// TODO: we might improve this by asking for the number again.
+			osFactory = new GenericOutputSpeechFactory("Can't process the task. I didn't hear a task number or command.");
+		}
+
+		// Create the Simple card content.
+		SimpleCard card = new SimpleCard();
+		card.setTitle("ProcessTask");
+		card.setContent(osFactory.getSpeechText());
+
+		return SpeechletResponse.newTellResponse(osFactory.getOutputSpeech(), card);
+		
 	}
 
 	/**
