@@ -200,7 +200,7 @@ public class AlexaJbpmSpeechlet implements Speechlet {
 		if (taskNumberSlot != null && taskCommandSlot != null) {
 			try {
 				Long taskNumber = new Long(taskNumberSlot.getValue());
-				KieServerClient.TaskCommand command = TaskCommand.valueOf(taskCommandSlot.getValue());
+				KieServerClient.TaskCommand command = TaskCommand.valueOf(taskCommandSlot.getValue().toUpperCase());
 				//osFactory = new TaskInstanceOutputSpeechFactory(kieServerClient.getTasksInfo(taskNumber));
 				kieServerClient.processTask(taskNumber,command);
 				osFactory = new GenericOutputSpeechFactory("Task with i.d. " + taskNumber + " successfully " + command.getSpeechText() + ".");
