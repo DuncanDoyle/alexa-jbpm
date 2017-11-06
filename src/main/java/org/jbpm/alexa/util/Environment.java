@@ -8,4 +8,8 @@ public interface Environment {
 	
 	String getTaskUser();
 	
+	String getKieServerUser();
+	
+	String getKieServerPassword();
+	
 }
