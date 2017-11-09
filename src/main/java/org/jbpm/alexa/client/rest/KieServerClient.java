@@ -68,7 +68,13 @@ public class KieServerClient {
 		}
 
 		// Create the config
-		CredentialsProvider credentialsProvider = new EnteredCredentialsProvider(environment.getKieServerUser(), environment.getKieServerPassword());
+		String user = environment.getKieServerUser();
+		String password = environment.getKieServerPassword();
+		
+		LOGGER.warn("KIE-Server credentials. User: '" + user + "', password: '" + password + "'.");
+		
+		
+		CredentialsProvider credentialsProvider = new EnteredCredentialsProvider(user, password);
 		KieServicesConfiguration kieServicesConfig = KieServicesFactory
 				.newRestConfiguration(environment.getKieServerUrl(), credentialsProvider);
 

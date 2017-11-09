@@ -44,7 +44,5 @@ public class EnvironmentVariablesEnvironment implements Environment {
 		}
 		return KIE_SERVER_PASSWORD;
 	}
-	
-	
 
 }
