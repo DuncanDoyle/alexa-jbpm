@@ -4,6 +4,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.servlet.annotation.WebServlet;
 
+import org.jbpm.alexa.util.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,9 @@ public class AlexaJbpmSpeechletServlet extends SpeechletServlet {
 	@Inject
 	private AlexaJbpmSpeechlet speechlet;
 	
+	@Inject
+	private Environment environment;
+	
 	/**
 	 * SerialVersionUID 
 	 */
@@ -29,6 +33,15 @@ public class AlexaJbpmSpeechletServlet extends SpeechletServlet {
 
 	public AlexaJbpmSpeechletServlet() {
 		LOGGER.info("Bootstrapping jBPM Alexa Skill.");
+		
+		
+		//Bit of debugging.
+		LOGGER.warn("Environment config: \n" +
+		 "KIE-Server URL: " + environment.getKieServerUrl() + "\n" +
+		 "Container-ID: " + environment.getContainerId() + "\n" +
+		 "KIE-Server User: " + environment.getKieServerUser() + "\n" +
+		 "KIE-Server Password: " + environment.getKieServerPassword() + "\n" + 
+		 "Task User: " + environment.getTaskUser());
 	}
 	
 	@PostConstruct
