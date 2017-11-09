@@ -17,37 +17,35 @@ import com.amazon.speech.speechlet.servlet.SpeechletServlet;
  */
 @WebServlet("/speech")
 public class AlexaJbpmSpeechletServlet extends SpeechletServlet {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AlexaJbpmSpeechletServlet.class);
-	
+
 	@Inject
 	private AlexaJbpmSpeechlet speechlet;
-	
+
 	@Inject
 	private Environment environment;
-	
+
 	/**
-	 * SerialVersionUID 
+	 * SerialVersionUID
 	 */
 	private static final long serialVersionUID = 1L;
 
 	public AlexaJbpmSpeechletServlet() {
 		LOGGER.info("Bootstrapping jBPM Alexa Skill.");
-		
-		
-		//Bit of debugging.
-		LOGGER.warn("Environment config: \n" +
-		 "KIE-Server URL: " + environment.getKieServerUrl() + "\n" +
-		 "Container-ID: " + environment.getContainerId() + "\n" +
-		 "KIE-Server User: " + environment.getKieServerUser() + "\n" +
-		 "KIE-Server Password: " + environment.getKieServerPassword() + "\n" + 
-		 "Task User: " + environment.getTaskUser());
 	}
-	
+
 	@PostConstruct
 	public void init() {
 		LOGGER.info("Post constructing skill. Setting speechlet: " + speechlet);
 		this.setSpeechlet(speechlet);
+
+		// Bit of debugging.
+		LOGGER.warn("Environment config: \n" + "KIE-Server URL: " + environment.getKieServerUrl() + "\n"
+				+ "Container-ID: " + environment.getContainerId() + "\n" + "KIE-Server User: "
+				+ environment.getKieServerUser() + "\n" + "KIE-Server Password: " + environment.getKieServerPassword()
+				+ "\n" + "Task User: " + environment.getTaskUser());
+
 	}
 
 }
