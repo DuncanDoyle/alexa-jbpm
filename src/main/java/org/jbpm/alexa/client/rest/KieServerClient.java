@@ -62,18 +62,15 @@ public class KieServerClient {
 
 	@PostConstruct
 	public void init() {
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("Creating KieServerClient for Kie-Server at '" + environment.getKieServerUrl()
-					+ "' and container '" + environment.getContainerId() + "'.");
-		}
-
-		// Create the config
 		String user = environment.getKieServerUser();
 		String password = environment.getKieServerPassword();
 		
-		LOGGER.warn("KIE-Server credentials. User: '" + user + "', password: '" + password + "'.");
-		
-		
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info("Creating KieServerClient for Kie-Server at '" + environment.getKieServerUrl()
+					+ "' and container '" + environment.getContainerId() + "'.");
+			LOGGER.info("Connecting with KIE-Server using user: '" + user + "'.");
+		}
+
 		CredentialsProvider credentialsProvider = new EnteredCredentialsProvider(user, password);
 		KieServicesConfiguration kieServicesConfig = KieServicesFactory
 				.newRestConfiguration(environment.getKieServerUrl(), credentialsProvider);

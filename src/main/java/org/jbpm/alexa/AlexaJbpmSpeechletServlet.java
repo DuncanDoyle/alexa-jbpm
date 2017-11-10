@@ -39,13 +39,6 @@ public class AlexaJbpmSpeechletServlet extends SpeechletServlet {
 	public void init() {
 		LOGGER.info("Post constructing skill. Setting speechlet: " + speechlet);
 		this.setSpeechlet(speechlet);
-
-		// Bit of debugging.
-		LOGGER.warn("Environment config: \n" + "KIE-Server URL: " + environment.getKieServerUrl() + "\n"
-				+ "Container-ID: " + environment.getContainerId() + "\n" + "KIE-Server User: "
-				+ environment.getKieServerUser() + "\n" + "KIE-Server Password: " + environment.getKieServerPassword()
-				+ "\n" + "Task User: " + environment.getTaskUser());
-
 	}
 
 }
