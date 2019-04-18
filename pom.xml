@@ -140,4 +140,14 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>openshift</id>
+			<build>
+				<finalName>ROOT</finalName>
+			</build>
+		</profile>
+	</profiles>
+
+
 </project>
