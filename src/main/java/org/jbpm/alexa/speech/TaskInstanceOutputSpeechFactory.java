@@ -10,7 +10,7 @@ public class TaskInstanceOutputSpeechFactory extends GenericOutputSpeechFactory 
 	}
 
 	private static String buildSpeechText(TaskInstance taskInstance) {
-		StringBuilder speechBuilder = new StringBuilder("This are the details for task with task number ")
+		StringBuilder speechBuilder = new StringBuilder("These are the details for task with task number ")
 				.append(taskInstance.getId()).append(". ");
 
 		speechBuilder.append("This task is created by ").append(taskInstance.getCreatedBy()).append(". ");
